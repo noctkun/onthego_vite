@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,7 +32,7 @@ const BikeRentPage = () => {
   const { user } = useAuth();
   const [listings, setListings] = useState<BikeListing[]>([]);
   const [searchCity, setSearchCity] = useState('');
-  const [rentalType, setRentalType] = useState<string>('');
+  const [rentalType, setRentalType] = useState<'short_term' | 'long_term' | ''>('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -149,29 +148,13 @@ const BikeRentPage = () => {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
-            <Button variant="ghost" onClick={() => navigate('/home')} className="mr-4">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
             <Bike className="h-6 w-6 text-green-600 mr-2" />
             <h1 className="text-xl font-bold">Bike Rental</h1>
             <div className="ml-auto">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    List Your Bike
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>List Your Bike</DialogTitle>
-                    <DialogDescription>
-                      This feature is coming soon! You'll be able to list your bike for rental.
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
+              <Button onClick={() => navigate('/create-vehicle/bike')}>
+                <Plus className="h-4 w-4 mr-2" />
+                List Your Bike
+              </Button>
             </div>
           </div>
         </div>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -143,29 +142,13 @@ const CarPoolPage = () => {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
-            <Button variant="ghost" onClick={() => navigate('/home')} className="mr-4">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-            <Car className="h-6 w-6 text-blue-600 mr-2" />
-            <h1 className="text-xl font-bold">Car Pooling</h1>
+            <Users className="h-6 w-6 text-blue-600 mr-2" />
+            <h1 className="text-xl font-bold">Car Pool</h1>
             <div className="ml-auto">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Trip
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Create New Trip</DialogTitle>
-                    <DialogDescription>
-                      This feature is coming soon! You'll be able to create your own carpool trips.
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
+              <Button onClick={() => navigate('/carpool/create')}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Trip
+              </Button>
             </div>
           </div>
         </div>

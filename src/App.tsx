@@ -12,7 +12,10 @@ import CarPoolPage from "@/components/CarPoolPage";
 import CarRentPage from "@/components/CarRentPage";
 import BikeRentPage from "@/components/BikeRentPage";
 import ProfilePage from "@/components/ProfilePage";
+import CreateCarpoolPage from "@/components/CreateCarpoolPage";
+import CreateVehiclePage from "@/components/CreateVehiclePage";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import AppLayout from "@/components/AppLayout";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,29 +38,69 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={user ? <Navigate to="/home" replace /> : <LandingPage />} />
       <Route path="/auth" element={user ? <Navigate to="/home" replace /> : <AuthPage />} />
+      
+      {/* Protected routes with sidebar layout */}
       <Route path="/home" element={
         <ProtectedRoute>
-          <HomePage />
+          <AppLayout>
+            <HomePage />
+          </AppLayout>
         </ProtectedRoute>
       } />
       <Route path="/carpool" element={
         <ProtectedRoute>
-          <CarPoolPage />
+          <AppLayout>
+            <CarPoolPage />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/carpool/create" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <CreateCarpoolPage />
+          </AppLayout>
         </ProtectedRoute>
       } />
       <Route path="/car-rent" element={
         <ProtectedRoute>
-          <CarRentPage />
+          <AppLayout>
+            <CarRentPage />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/car-rent/create" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <CreateVehiclePage />
+          </AppLayout>
         </ProtectedRoute>
       } />
       <Route path="/bike-rent" element={
         <ProtectedRoute>
-          <BikeRentPage />
+          <AppLayout>
+            <BikeRentPage />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/bike-rent/create" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <CreateVehiclePage />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/create-vehicle/:type" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <CreateVehiclePage />
+          </AppLayout>
         </ProtectedRoute>
       } />
       <Route path="/profile" element={
         <ProtectedRoute>
-          <ProfilePage />
+          <AppLayout>
+            <ProfilePage />
+          </AppLayout>
         </ProtectedRoute>
       } />
       <Route path="*" element={<NotFound />} />

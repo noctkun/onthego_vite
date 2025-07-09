@@ -1,211 +1,131 @@
 
-import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { Car, Users, Bike, MapPin, Clock, Star, LogOut } from 'lucide-react';
+import { Car, Bike, Users, MapPin, Clock, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-interface UserProfile {
-  name: string;
-  rating: number;
-  total_ratings: number;
-  user_type: string;
-}
-
 const HomePage = () => {
-  const { user, signOut } = useAuth();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [stats, setStats] = useState({
-    activeTrips: 0,
-    availableCars: 0,
-    availableBikes: 0,
-  });
+  const { user } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    fetchUserProfile();
-    fetchStats();
-  }, [user]);
-
-  const fetchUserProfile = async () => {
-    if (!user) return;
-    
-    const { data } = await supabase
-      .from('user_profiles')
-      .select('name, rating, total_ratings, user_type')
-      .eq('user_id', user.id)
-      .single();
-    
-    if (data) setProfile(data);
-  };
-
-  const fetchStats = async () => {
-    const [tripsResult, carsResult, bikesResult] = await Promise.all([
-      supabase.from('carpool_trips').select('id', { count: 'exact' }).eq('status', 'active'),
-      supabase.from('vehicle_listings').select('id', { count: 'exact' }).eq('vehicle_type', 'car').eq('is_available', true),
-      supabase.from('vehicle_listings').select('id', { count: 'exact' }).eq('vehicle_type', 'bike').eq('is_available', true),
-    ]);
-
-    setStats({
-      activeTrips: tripsResult.count || 0,
-      availableCars: carsResult.count || 0,
-      availableBikes: bikesResult.count || 0,
-    });
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
 
   const services = [
     {
-      icon: <Car className="h-8 w-8 text-blue-500" />,
-      title: "Car Pooling",
-      description: "Share rides and split costs",
-      count: stats.activeTrips,
-      route: "/carpool"
+      title: 'Car Pool',
+      description: 'Share rides and split costs with fellow travelers',
+      icon: Users,
+      color: 'bg-gradient-to-r from-blue-500 to-purple-600',
+      route: '/carpool'
     },
     {
-      icon: <Car className="h-8 w-8 text-purple-500" />,
-      title: "Car Rental",
-      description: "Rent cars by hour or day",
-      count: stats.availableCars,
-      route: "/car-rent"
+      title: 'Car Rental',
+      description: 'Rent cars by the hour or day for your convenience',
+      icon: Car,
+      color: 'bg-gradient-to-r from-purple-500 to-pink-600',
+      route: '/car-rent'
     },
     {
-      icon: <Bike className="h-8 w-8 text-green-500" />,
-      title: "Bike Rental",
-      description: "Eco-friendly bike rentals",
-      count: stats.availableBikes,
-      route: "/bike-rent"
-    },
+      title: 'Bike Rental',
+      description: 'Quick and eco-friendly bike rentals for short trips',
+      icon: Bike,
+      color: 'bg-gradient-to-r from-green-500 to-teal-600',
+      route: '/bike-rent'
+    }
+  ];
+
+  const stats = [
+    { label: 'Active Users', value: '10K+', icon: Users },
+    { label: 'Cities Covered', value: '50+', icon: MapPin },
+    { label: 'Trips Completed', value: '1M+', icon: TrendingUp },
+    { label: 'Hours Saved', value: '5M+', icon: Clock },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
-              <Car className="h-8 w-8 text-blue-600" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                OnTheGo
-              </h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                onClick={() => navigate('/profile')}
-                className="flex items-center gap-2"
-              >
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-                  {profile?.name?.charAt(0) || 'U'}
-                </div>
-                <span className="hidden sm:inline">{profile?.name || 'User'}</span>
-              </Button>
-              <Button variant="outline" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {profile?.name || 'User'}!
-          </h2>
-          <div className="flex items-center gap-4 text-gray-600">
-            <div className="flex items-center gap-1">
-              <Star className="h-4 w-4 text-yellow-500" />
-              <span>{profile?.rating || 0} ({profile?.total_ratings || 0} reviews)</span>
-            </div>
-            <div className="flex items-center gap-1 capitalize">
-              <Users className="h-4 w-4" />
-              <span>{profile?.user_type || 'new'} user</span>
-            </div>
-          </div>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Welcome to OnTheGo
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Your one-stop solution for carpooling, car rentals, and bike rentals. 
+            Travel smart, save money, and connect with your community.
+          </p>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardContent className="flex items-center p-6">
-              <MapPin className="h-8 w-8 text-blue-500 mr-4" />
-              <div>
-                <p className="text-2xl font-bold">{stats.activeTrips}</p>
-                <p className="text-gray-600">Active Trips</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center p-6">
-              <Car className="h-8 w-8 text-purple-500 mr-4" />
-              <div>
-                <p className="text-2xl font-bold">{stats.availableCars}</p>
-                <p className="text-gray-600">Available Cars</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center p-6">
-              <Bike className="h-8 w-8 text-green-500 mr-4" />
-              <div>
-                <p className="text-2xl font-bold">{stats.availableBikes}</p>
-                <p className="text-gray-600">Available Bikes</p>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          {services.map((service) => (
+            <Card key={service.title} className="hover:shadow-lg transition-shadow cursor-pointer group">
+              <CardHeader>
+                <div className={`w-16 h-16 rounded-lg ${service.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <service.icon className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl">{service.title}</CardTitle>
+                <CardDescription className="text-gray-600">
+                  {service.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  onClick={() => navigate(service.route)}
+                  className="w-full"
+                  variant="outline"
+                >
+                  Explore {service.title}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Services */}
-        <div className="mb-8">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6">Our Services</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {services.map((service, index) => (
-              <Card key={index} className="group hover:shadow-lg transition-all duration-300 cursor-pointer"
-                onClick={() => navigate(service.route)}>
-                <CardHeader className="text-center">
-                  <div className="flex justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    {service.icon}
-                  </div>
-                  <CardTitle>{service.title}</CardTitle>
-                  <CardDescription>{service.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-lg font-semibold text-blue-600 mb-4">
-                    {service.count} available
-                  </p>
-                  <Button className="w-full">
-                    Explore
-                  </Button>
-                </CardContent>
-              </Card>
+        {/* Stats Section */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-16">
+          <h2 className="text-2xl font-bold text-center mb-8">Platform Statistics</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="flex justify-center mb-2">
+                  <stat.icon className="h-8 w-8 text-blue-600" />
+                </div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                <div className="text-sm text-gray-600">{stat.label}</div>
+              </div>
             ))}
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Recent Activity
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600 text-center py-8">
-              No recent activity. Start by booking a ride or renting a vehicle!
-            </p>
-          </CardContent>
-        </Card>
+        {/* Quick Actions */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white text-center">
+          <h2 className="text-2xl font-bold mb-4">Ready to Get Started?</h2>
+          <p className="text-blue-100 mb-6">
+            Choose your preferred mode of transportation and start your journey today!
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Button 
+              onClick={() => navigate('/carpool')} 
+              variant="secondary"
+              size="lg"
+            >
+              Find a Carpool
+            </Button>
+            <Button 
+              onClick={() => navigate('/car-rent')} 
+              variant="secondary"
+              size="lg"
+            >
+              Rent a Car
+            </Button>
+            <Button 
+              onClick={() => navigate('/bike-rent')} 
+              variant="secondary"
+              size="lg"
+            >
+              Rent a Bike
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
