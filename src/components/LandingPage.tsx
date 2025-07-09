@@ -2,8 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Car, Users, Bike, Star, Shield, Clock, MapPin, Zap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+
   const features = [
     {
       icon: <Car className="h-12 w-12 text-blue-500" />,
@@ -72,7 +75,11 @@ const LandingPage = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="gradient-primary text-white border-0 hover:opacity-90 transition-opacity">
+                <Button 
+                  size="lg" 
+                  className="gradient-primary text-white border-0 hover:opacity-90 transition-opacity"
+                  onClick={() => navigate('/auth')}
+                >
                   Get Started Today
                 </Button>
                 <Button variant="outline" size="lg" className="border-2 border-purple-200 hover:bg-purple-50">
@@ -174,7 +181,11 @@ const LandingPage = () => {
           <p className="text-xl mb-8 opacity-90">
             Join our community and start saving money while making new connections
           </p>
-          <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 font-semibold">
+          <Button 
+            size="lg" 
+            className="bg-white text-purple-600 hover:bg-gray-100 font-semibold"
+            onClick={() => navigate('/auth')}
+          >
             <MapPin className="mr-2 h-5 w-5" />
             Start Your Journey
           </Button>

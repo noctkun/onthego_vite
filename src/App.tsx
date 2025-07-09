@@ -1,12 +1,69 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import LandingPage from "@/components/LandingPage";
+import AuthPage from "@/components/AuthPage";
+import HomePage from "@/components/HomePage";
+import CarPoolPage from "@/components/CarPoolPage";
+import CarRentPage from "@/components/CarRentPage";
+import BikeRentPage from "@/components/BikeRentPage";
+import ProfilePage from "@/components/ProfilePage";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+const AppRoutes = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={user ? <Navigate to="/home" replace /> : <LandingPage />} />
+      <Route path="/auth" element={user ? <Navigate to="/home" replace /> : <AuthPage />} />
+      <Route path="/home" element={
+        <ProtectedRoute>
+          <HomePage />
+        </ProtectedRoute>
+      } />
+      <Route path="/carpool" element={
+        <ProtectedRoute>
+          <CarPoolPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/car-rent" element={
+        <ProtectedRoute>
+          <CarRentPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/bike-rent" element={
+        <ProtectedRoute>
+          <BikeRentPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <ProfilePage />
+        </ProtectedRoute>
+      } />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -14,11 +71,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
