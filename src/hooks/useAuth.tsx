@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signUp = async (email: string, password: string, name: string, age: number) => {
-    const redirectUrl = `${window.location.origin}/`;
+    const redirectUrl = "https://onthego-vite.vercel.app/";
     
     const { error } = await supabase.auth.signUp({
       email,
