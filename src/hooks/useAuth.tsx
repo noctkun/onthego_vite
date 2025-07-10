@@ -1,7 +1,7 @@
 
 import { useState, useEffect, createContext, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, SUPABASE_EMAIL_REDIRECT_URL } from '@/integrations/supabase/client';
 
 interface AuthContextType {
   user: User | null;
@@ -84,13 +84,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signUp = async (email: string, password: string, name: string, age: number) => {
-    const redirectUrl = "https://onthego-vite.vercel.app/";
-    
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl,
+        emailRedirectTo: SUPABASE_EMAIL_REDIRECT_URL,
         data: {
           name,
           age,
