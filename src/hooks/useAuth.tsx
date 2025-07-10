@@ -47,19 +47,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const createUserProfile = async (user: User) => {
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .single();
+    try {
+      // Check if profile already exists
+      const { data: existingProfile, error: checkError } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
 
-    if (!data && !error) {
-      // Profile doesn't exist, create it
-      await supabase.from('user_profiles').insert({
-        user_id: user.id,
-        name: user.user_metadata?.name || 'User',
-        age: user.user_metadata?.age || 18,
-      });
+      if (checkError && checkError.code !== 'PGRST116') {
+        // PGRST116 is "not found" error, which is expected if profile doesn't exist
+        console.error('Error checking profile:', checkError);
+        return;
+      }
+
+      if (!existingProfile) {
+        // Profile doesn't exist, create it
+        const { error: insertError } = await supabase.from('user_profiles').insert({
+          user_id: user.id,
+          name: user.user_metadata?.name || 'User',
+          age: user.user_metadata?.age || 18,
+          user_type: 'new',
+          rating: 0,
+          total_ratings: 0,
+        });
+
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+        } else {
+          console.log('User profile created successfully');
+        }
+      }
+    } catch (error) {
+      console.error('Error in createUserProfile:', error);
     }
   };
 

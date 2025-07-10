@@ -5,12 +5,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { ThemeProvider } from "@/hooks/useTheme";
 import LandingPage from "@/components/LandingPage";
 import AuthPage from "@/components/AuthPage";
 import HomePage from "@/components/HomePage";
 import CarPoolPage from "@/components/CarPoolPage";
 import CarRentPage from "@/components/CarRentPage";
 import BikeRentPage from "@/components/BikeRentPage";
+import BikePoolPage from "@/components/BikePoolPage";
 import ProfilePage from "@/components/ProfilePage";
 import CreateCarpoolPage from "@/components/CreateCarpoolPage";
 import CreateVehiclePage from "@/components/CreateVehiclePage";
@@ -89,6 +91,13 @@ const AppRoutes = () => {
           </AppLayout>
         </ProtectedRoute>
       } />
+      <Route path="/bike-pool" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <BikePoolPage />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
       <Route path="/create-vehicle/:type" element={
         <ProtectedRoute>
           <AppLayout>
@@ -110,15 +119,17 @@ const AppRoutes = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

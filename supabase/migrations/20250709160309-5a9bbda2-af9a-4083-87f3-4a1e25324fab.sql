@@ -161,27 +161,51 @@ CREATE POLICY "Users can rate others" ON public.user_ratings FOR INSERT WITH CHE
 CREATE OR REPLACE FUNCTION update_user_rating()
 RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE public.user_profiles 
-    SET 
-        rating = (
-            SELECT ROUND(AVG(rating::DECIMAL), 1) 
-            FROM public.user_ratings 
-            WHERE rated_user_id = NEW.rated_user_id
-        ),
-        total_ratings = (
-            SELECT COUNT(*) 
-            FROM public.user_ratings 
-            WHERE rated_user_id = NEW.rated_user_id
-        ),
-        updated_at = NOW()
-    WHERE id = NEW.rated_user_id;
-    RETURN NEW;
+    -- Handle INSERT, UPDATE, and DELETE operations
+    IF TG_OP = 'DELETE' THEN
+        -- Update rating when a rating is deleted
+        UPDATE public.user_profiles 
+        SET 
+            rating = COALESCE((
+                SELECT ROUND(AVG(rating::DECIMAL), 1) 
+                FROM public.user_ratings 
+                WHERE rated_user_id = OLD.rated_user_id
+            ), 0.0),
+            total_ratings = (
+                SELECT COUNT(*) 
+                FROM public.user_ratings 
+                WHERE rated_user_id = OLD.rated_user_id
+            ),
+            updated_at = NOW()
+        WHERE id = OLD.rated_user_id;
+        RETURN OLD;
+    ELSE
+        -- Handle INSERT and UPDATE operations
+        UPDATE public.user_profiles 
+        SET 
+            rating = COALESCE((
+                SELECT ROUND(AVG(rating::DECIMAL), 1) 
+                FROM public.user_ratings 
+                WHERE rated_user_id = NEW.rated_user_id
+            ), 0.0),
+            total_ratings = (
+                SELECT COUNT(*) 
+                FROM public.user_ratings 
+                WHERE rated_user_id = NEW.rated_user_id
+            ),
+            updated_at = NOW()
+        WHERE id = NEW.rated_user_id;
+        RETURN NEW;
+    END IF;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger to automatically update user rating
+-- Drop existing trigger if it exists
+DROP TRIGGER IF EXISTS trigger_update_user_rating ON public.user_ratings;
+
+-- Create trigger to automatically update user rating for all operations
 CREATE TRIGGER trigger_update_user_rating
-    AFTER INSERT ON public.user_ratings
+    AFTER INSERT OR UPDATE OR DELETE ON public.user_ratings
     FOR EACH ROW
     EXECUTE FUNCTION update_user_rating();
 

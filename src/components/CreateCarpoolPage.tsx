@@ -35,13 +35,42 @@ const CreateCarpoolPage = () => {
 
     try {
       // Get user profile
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
         .select('id')
         .eq('user_id', user.id)
         .single();
 
-      if (!profile) {
+      let profileId = profile?.id;
+
+      // If profile doesn't exist, create it
+      if (!profile && profileError) {
+        const { data: newProfile, error: createError } = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: user.id,
+            name: user.user_metadata?.name || 'User',
+            age: user.user_metadata?.age || 18,
+            user_type: 'new',
+            rating: 0,
+            total_ratings: 0,
+          })
+          .select('id')
+          .single();
+
+        if (createError) {
+          toast({
+            title: "Error",
+            description: "Failed to create user profile. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        profileId = newProfile.id;
+      }
+
+      if (!profileId) {
         toast({
           title: "Error",
           description: "Profile not found. Please complete your profile first.",
@@ -53,7 +82,7 @@ const CreateCarpoolPage = () => {
       const { error } = await supabase
         .from('carpool_trips')
         .insert({
-          driver_id: profile.id,
+          driver_id: profileId,
           from_destination: formData.from_destination,
           to_destination: formData.to_destination,
           start_time: formData.start_time,
